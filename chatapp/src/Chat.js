@@ -12,6 +12,23 @@ class Chat extends React.Component{
         };
 
         this.socket = io('localhost:8080');
+        this.sendMessage = ev => {
+            ev.preventDefault();
+            this.socket.emit('SEND_MESSAGE', {
+                author: this.state.username,
+                message: this.state.message
+            });
+            this.setState({message: ''});
+        }
+        this.socket.on('RECEIVE_MESSAGE', function(data){
+            addMessage(data);
+        });
+        
+        const addMessage = data => {
+            console.log(data);
+            this.setState({messages: [...this.state.messages, data]});
+            console.log(this.state.messages);
+        };
     }
     render(){
         return (
@@ -34,7 +51,7 @@ class Chat extends React.Component{
                                     <br/>
                                     <input type="text" placeholder="Message" className="form-control" value={this.state.message} onChange={ev => this.setState({message: ev.target.value})}/>
                                     <br/>
-                                    <button className="btn btn-primary form-control">Send</button>
+                                    <button onClick={this.sendMessage} className="btn btn-primary form-control">Send</button>
                                 </div>
                             </div>
                         </div>
